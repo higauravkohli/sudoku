@@ -43,17 +43,17 @@ public class SudokuCommandLine implements CommandLineRunner{
 			Sudoku out = null;
 			
 			try {
-				out = solver.solve(new Sudoku(puzzle));
+				out = solver.solve(new Sudoku(in));
 				if(!out.solved()) {
 					print(in, out);
-					System.out.print("\nUnsolved ");
+					System.out.print("\nUnsolved");
 				}
 				else {
 					solved++;
 					System.out.print("\nSolved " + line);
 				}
 
-				System.out.println(" in " + (System.currentTimeMillis() - time) + " millis");
+				System.out.println(" " + total + " puzzle in " + (System.currentTimeMillis() - time) + " millis");
 			}catch(Exception e) {
 				e.printStackTrace();
 				error++;
@@ -61,7 +61,7 @@ public class SudokuCommandLine implements CommandLineRunner{
 				print(in, out);
 			}
 		}
-		System.out.println("Error - " + error + ", Solved - " + solved + " out of " + total + " in " + (System.currentTimeMillis()-gtime)/1000 + " seconds");
+		System.out.println("Error - " + error + ", Unsolved - " + (total-solved-error) + " Solved - " + solved + " out of " + total + " in " + (System.currentTimeMillis()-gtime)/1000 + " seconds");
 	}
 
 	private void print(Sudoku in, Sudoku out) {
@@ -74,38 +74,44 @@ public class SudokuCommandLine implements CommandLineRunner{
 			System.out.println(out);
 			System.out.println("\n***********\n\n");
 			if(!out.solved()) {
-				int[][][] possibilities = out.possibilities();
-				for(int x=0; x<9; x++) {
-					System.out.println();
-					if(x%3 == 0) {
-						System.out.println();
-						System.out.println(" + --------- | --------- | --------- +++ --------- | --------- | --------- +++ --------- | --------- | ---------");
-						System.out.println();
-					}
-
-					for(int y=0; y<9; y++){
-						System.out.print(" | ");
-						if(y > 0 && y%3 == 0)
-							System.out.print("| ");
-						int chars = 9;
-						for(int i=0; i<chars; i++) {
-							boolean printed = false;
-							if(possibilities[x][y] != null) {
-								for(int poss : possibilities[x][y]) {
-									if(poss == (i+1)) {
-										System.out.print(poss);
-										printed = true;
-										break;
-									}
-								}
-							}
-							if(!printed)
-								System.out.print(" ");
-						}
-					}
-				}
+				printPossibilities(out);
 			}
 				
+		}
+		else
+			printPossibilities(in);
+	}
+	
+	private void printPossibilities(Sudoku sudoku) {
+		int[][][] possibilities = sudoku.possibilities();
+		for(int x=0; x<9; x++) {
+			System.out.println();
+			if(x%3 == 0) {
+				System.out.println();
+				System.out.println(" + --------- | --------- | --------- +++ --------- | --------- | --------- +++ --------- | --------- | ---------");
+				System.out.println();
+			}
+
+			for(int y=0; y<9; y++){
+				System.out.print(" | ");
+				if(y > 0 && y%3 == 0)
+					System.out.print("| ");
+				int chars = 9;
+				for(int i=0; i<chars; i++) {
+					boolean printed = false;
+					if(possibilities[x][y] != null) {
+						for(int poss : possibilities[x][y]) {
+							if(poss == (i+1)) {
+								System.out.print(poss);
+								printed = true;
+								break;
+							}
+						}
+					}
+					if(!printed)
+						System.out.print(" ");
+				}
+			}
 		}
 	}
 	

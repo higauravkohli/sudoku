@@ -10,15 +10,33 @@ public class Sudoku {
 	private Util util = new Util();
 
 	private int[][] puzzle = new int[9][9];
+	private int[][] unfit = new int[9][9];
 	
 	public Sudoku(int[][] puzzle) {
 		this.puzzle = puzzle;
 	}
 	
+	public Sudoku(Sudoku sudoku) {
+		for(int x=0; x<9; x++) {
+			for(int y=0;y<9;y++) {
+				puzzle[x][y] = sudoku.puzzle[x][y];
+				unfit[x][y] = sudoku.unfit[x][y];
+			}
+		}
+	}
+	
+	public void unfit(int x, int y, int val) {
+		unfit[x][y] = val;
+	}
+	
 	public int[][] getPuzzle() {
 		return puzzle;
 	}
-	
+
+	public void setPuzzle(int[][] puzzle) {
+		this.puzzle = puzzle;
+	}
+
 	public int get(int x, int y) {
 		return puzzle[x][y];
 	}
@@ -29,7 +47,7 @@ public class Sudoku {
 		puzzle[x][y] = val;
 	}
 	
-	public boolean fit(int x, int y, int val) {
+	private boolean fit(int x, int y, int val) {
 		return puzzle[x][y] == 0 && rowFit(x, val) && colFit(y, val);
 	}
 	
@@ -61,7 +79,7 @@ public class Sudoku {
 		int[][][] possibilities = new int[9][9][9];
 		for(int x=0; x<9; x++) {
 			for(int y=0; y<9; y++) {
-				if(puzzle[x][y] == 0) {
+				if(puzzle[x][y] == 0 && unfit[x][y] == 0) {
 					List<Integer> possibilitySet = new ArrayList<>();
 					
 					List<Integer> rows = rowPossibilities(x);
