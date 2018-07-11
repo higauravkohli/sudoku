@@ -1,5 +1,6 @@
 package com.gk.sudoku.algo;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.gk.sudoku.Util;
+import com.gk.sudoku.model.Position;
 import com.gk.sudoku.model.Sudoku;
 
 @Component
@@ -32,57 +34,52 @@ public class SudokuSolver {
 	}
 
 	private boolean pickRandom(Sudoku sudoku, int[][][] possibilities) {
-		Map<String, String> possibles = new HashMap<>();
-		for (int x = 0; x < 9; x++) {
-			for (int y = 0; y < 9; y++) {
-				if (possibilities[x][y] != null && possibilities[x][y].length == 2) {
-					possibles.put(x + "_" + y, possibilities[x][y][0] + "_" + possibilities[x][y][1]);
+		Map<Position, List<Integer>> possibles = new HashMap<>();
+		for (int i = 2; i < 3; i++) {
+			for (int x = 0; x < 9; x++) {
+				for (int y = 0; y < 9; y++) {
+					if (possibilities[x][y] != null && possibilities[x][y].length == i) {
+						possibles.put(new Position(x, y), util.arrayTolist(possibilities[x][y]));
+					}
 				}
 			}
-		}
-
-		for (String possible : possibles.keySet()) {
-			int x = Integer.parseInt(possible.split("_")[0]);
-			int y = Integer.parseInt(possible.split("_")[1]);
-
-			if (rowRandom(sudoku, x, y, possibles))
-				return true;
-			if (colRandom(sudoku, x, y, possibles))
-				return true;
-			if (boxRandom(sudoku, x, y, possibles))
-				return true;
-		}
-
-		return false;
-	}
-
-	private boolean rowRandom(Sudoku sudoku, int x, int y, Map<String, String> possibles) {
-		for (int y1 = 0; y1 < 9; y1++) {
-			if (y1 > y) {
-				if (possibles.get(x + "_" + y1) != null
-						&& possibles.get(x + "_" + y1).equals(possibles.get(x + "_" + y))) {
-					if (tryPossibilities(sudoku, x, y, x, y1,
-							Integer.parseInt(possibles.get(x + "_" + y).split("_")[0]),
-							Integer.parseInt(possibles.get(x + "_" + y).split("_")[1])))
+			if(possibles.size() > 0) {
+				for (Position pos : possibles.keySet()) {
+					if (rowRandom(sudoku, pos, possibles))
+						return true;
+					if (colRandom(sudoku, pos, possibles))
+						return true;
+					if (boxRandom(sudoku, pos, possibles))
 						return true;
 				}
 			}
 		}
+
 		return false;
 	}
 
-	private boolean boxRandom(Sudoku sudoku, int x, int y, Map<String, String> possibles) {
+	private boolean rowRandom(Sudoku sudoku, Position pos, Map<Position, List<Integer>> possibles) {
+		for (int y = pos.y() + 1; y < 9; y++) {
+			Position newPos = new Position(pos.x(), y);
+			if (possibles.get(newPos) != null && possibles.get(newPos).equals(possibles.get(pos))) {
+				if (tryPossibilities(sudoku, new ArrayList<Position>() {{add(pos); add(newPos);}}, possibles.get(pos)))
+					return true;
+			}
+		}
+		return false;
+	}
+
+	private boolean boxRandom(Sudoku sudoku, Position pos, Map<Position, List<Integer>> possibles) {
 		for (int x1 = 0; x1 < 9; x1++) {
 			for (int y1 = 0; y1 < 9; y1++) {
-				if (x / 3 == x1 / 3 && y / 3 == y1 / 3) {
-					if (x != x1 && y != y1)
+				if (pos.x() / 3 == x1 / 3 && pos.y() / 3 == y1 / 3) {
+					if (pos.x() != x1 && pos.y() != y1)
 						continue;
 
-					if (possibles.get(x1 + "_" + y1) != null
-							&& possibles.get(x1 + "_" + y1).equals(possibles.get(x + "_" + y))) {
-						if (tryPossibilities(sudoku, x, y, x1, y1,
-								Integer.parseInt(possibles.get(x + "_" + y).split("_")[0]),
-								Integer.parseInt(possibles.get(x + "_" + y).split("_")[1])))
+					Position newPos = new Position(x1, y1);
+
+					if (possibles.get(newPos) != null && possibles.get(newPos).equals(possibles.get(pos))) {
+						if (tryPossibilities(sudoku, new ArrayList<Position>() {{add(pos); add(newPos);}}, possibles.get(pos)))
 							return true;
 					}
 				}
@@ -91,57 +88,70 @@ public class SudokuSolver {
 		return false;
 	}
 
-	private boolean colRandom(Sudoku sudoku, int x, int y, Map<String, String> possibles) {
-		for (int x1 = 0; x1 < 9; x1++) {
-			if (x1 > x) {
-				if (possibles.get(x1 + "_" + y) != null
-						&& possibles.get(x1 + "_" + y).equals(possibles.get(x + "_" + y))) {
-					if (tryPossibilities(sudoku, x, y, x1, y,
-							Integer.parseInt(possibles.get(x + "_" + y).split("_")[0]),
-							Integer.parseInt(possibles.get(x + "_" + y).split("_")[1])))
+	private boolean colRandom(Sudoku sudoku, Position pos, Map<Position, List<Integer>> possibles) {
+		for (int x = pos.x() + 1; x < 9; x++) {
+			Position newPos = new Position(x, pos.y());
+			if (possibles.get(newPos) != null && possibles.get(newPos).equals(possibles.get(pos))) {
+				if (tryPossibilities(sudoku, new ArrayList<Position>() {{add(pos); add(newPos);}}, possibles.get(pos)))
 					return true;
-				}
 			}
 		}
 		return false;
 	}
 
-	private boolean tryPossibilities(Sudoku sudoku, int x, int y, int x1, int y1, int poss1, int poss2) {
+	private boolean tryPossibilities(Sudoku sudoku, List<Position> pos, List<Integer> possibles) {
+
+		for(List<Integer> possibility : possibilities(possibles.size()))
+			if(tryPossibility(sudoku, pos, possibles, possibility))
+				return true;
+		
+		return false;
+	}
+	
+	private List<List<Integer>> possibilities(int size) {
+		List<List<Integer>> result = new ArrayList<>();
+	 
+		result.add(new ArrayList<Integer>());
+	 
+		for (int i = 0; i < size; i++) {
+			List<List<Integer>> current = new ArrayList<>();
+	 
+			for (List<Integer> l : result) {
+				for (int j = 0; j < l.size()+1; j++) {
+					l.add(j, i);
+	 
+					List<Integer> temp = new ArrayList<>(l);
+					current.add(temp);
+					l.remove(j);
+				}
+			}
+	 
+			result = new ArrayList<>(current);
+		}
+	 
+		return result;
+	}
+	
+	private boolean tryPossibility(Sudoku sudoku, List<Position> pos, List<Integer> possibles, List<Integer> possibility) {
 		Sudoku trySudoku = new Sudoku(sudoku);
 
 		try {
-			trySudoku.set(x, y, poss1);
-			trySudoku.set(x1, y1, poss2);
+			for(int i=0; i<possibility.size(); i++) {
+				trySudoku.set(pos.get(i), possibles.get(possibility.get(i)));
+			}
 			solve(trySudoku);
 		} catch (Exception e) {
-			sudoku.unfit(x, y, poss1);
-			sudoku.unfit(x1, y1, poss2);
+			for(int i=0; i<possibility.size(); i++) {
+				sudoku.unfit(pos.get(i), possibles.get(possibility.get(i)));
+			}
 		}
 		if (trySudoku.solved()) {
 			sudoku.setPuzzle(trySudoku.getPuzzle());
 			return true;
-		} 
-		sudoku.unfit(x, y, poss1);
-		sudoku.unfit(x1, y1, poss2);
-
-		trySudoku = new Sudoku(sudoku);
-
-		try {
-			trySudoku.set(x, y, poss2);
-			trySudoku.set(x1, y1, poss1);
-			solve(trySudoku);
-		} catch (Exception e) {
-			sudoku.unfit(x, y, poss2);
-			sudoku.unfit(x1, y1, poss1);
 		}
-
-		if (trySudoku.solved()) {
-			sudoku.setPuzzle(trySudoku.getPuzzle());
-			return true;
-		} 
-		
-		sudoku.unfit(x, y, poss2);
-		sudoku.unfit(x1, y1, poss1);
+		for(int i=0; i<possibility.size(); i++) {
+			sudoku.unfit(pos.get(i), possibles.get(possibility.get(i)));
+		}
 		
 		return false;
 	}

@@ -24,6 +24,10 @@ public class Sudoku {
 			}
 		}
 	}
+
+	public void unfit(Position pos, int val) {
+		unfit(pos.x(), pos.y(), val);
+	}
 	
 	public void unfit(int x, int y, int val) {
 		unfit[x][y] = val;
@@ -39,6 +43,10 @@ public class Sudoku {
 
 	public int get(int x, int y) {
 		return puzzle[x][y];
+	}
+
+	public void set(Position pos, int val) {
+		set(pos.x(), pos.y(), val);
 	}
 	
 	public void set(int x, int y, int val) {
