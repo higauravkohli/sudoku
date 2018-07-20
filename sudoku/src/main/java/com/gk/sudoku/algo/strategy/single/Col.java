@@ -1,4 +1,4 @@
-package com.gk.sudoku.algo.strategy;
+package com.gk.sudoku.algo.strategy.single;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +8,7 @@ import com.gk.sudoku.Util;
 import com.gk.sudoku.algo.Strategy;
 import com.gk.sudoku.model.Sudoku;
 
-public class ColHit implements Strategy {
+public class Col implements Strategy {
 
 	private Util util = new Util();
 

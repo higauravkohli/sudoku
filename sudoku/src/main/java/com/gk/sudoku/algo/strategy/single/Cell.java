@@ -1,9 +1,9 @@
-package com.gk.sudoku.algo.strategy;
+package com.gk.sudoku.algo.strategy.single;
 
 import com.gk.sudoku.algo.Strategy;
 import com.gk.sudoku.model.Sudoku;
 
-public class SingleHit implements Strategy{
+public class Cell implements Strategy{
 
 	@Override
 	public boolean hit(Sudoku sudoku, int[][][] possibilities) {

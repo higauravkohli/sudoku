@@ -2,26 +2,16 @@ package com.gk.sudoku.algo;
 
 import org.springframework.stereotype.Component;
 
-import com.gk.sudoku.algo.strategy.BoxHit;
-import com.gk.sudoku.algo.strategy.BoxMuti;
-import com.gk.sudoku.algo.strategy.ColHit;
-import com.gk.sudoku.algo.strategy.ColMuti;
-import com.gk.sudoku.algo.strategy.RowHit;
-import com.gk.sudoku.algo.strategy.RowMuti;
-import com.gk.sudoku.algo.strategy.SingleHit;
+import com.gk.sudoku.algo.strategy.dual.DualStrategy;
+import com.gk.sudoku.algo.strategy.single.SingleStrategy;
 import com.gk.sudoku.model.Sudoku;
 
 @Component
 public class SudokuSolver {
 
 	private Strategy[] strategies = {
-		new SingleHit()	,
-		new RowHit(),
-		new ColHit(),
-		new BoxHit(),
-		new RowMuti(),
-		new ColMuti(),
-		new BoxMuti()
+		new SingleStrategy(),
+		new DualStrategy()
 	};
 
 	public Sudoku solve(Sudoku sudoku) {

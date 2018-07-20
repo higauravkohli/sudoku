@@ -32,9 +32,6 @@ public class Util {
 	}
 	
 	public boolean tryPossibilities(Sudoku sudoku, List<Position> pos, List<Integer> possibles) {
-		if(possibles.size() != 2)
-			return false;
-		
 		for(List<Integer> possibility : possibilities(possibles.size()))
 			if(tryPossibility(sudoku, pos, possibles, possibility))
 				return true;
