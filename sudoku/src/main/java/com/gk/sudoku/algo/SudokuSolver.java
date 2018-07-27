@@ -2,7 +2,7 @@ package com.gk.sudoku.algo;
 
 import org.springframework.stereotype.Component;
 
-import com.gk.sudoku.algo.strategy.dual.DualStrategy;
+import com.gk.sudoku.algo.strategy.multi.DualStrategy;
 import com.gk.sudoku.algo.strategy.single.SingleStrategy;
 import com.gk.sudoku.model.Sudoku;
 

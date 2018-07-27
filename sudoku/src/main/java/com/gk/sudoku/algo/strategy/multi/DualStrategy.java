@@ -1,4 +1,4 @@
-package com.gk.sudoku.algo.strategy.dual;
+package com.gk.sudoku.algo.strategy.multi;
 
 import com.gk.sudoku.algo.Strategy;
 import com.gk.sudoku.model.Sudoku;

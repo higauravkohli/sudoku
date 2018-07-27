@@ -39,28 +39,43 @@ public class Util {
 		return false;
 	}
 	
+	public List<List<Integer>> possibilities(int min, int max, int size){
+		int[] A = new int[max-min];
+		for(int i=0; i<A.length; i++)
+			A[i] = min+i;
+		
+	    List<List<Integer>> set = new ArrayList<>();
+	    for(Integer s : A)
+	    {
+	    	List<Integer> ss = new ArrayList<>();
+	        ss.add(s);
+	        set.add(ss);
+	    }
+	    
+	    return getCombinations(A, set, size);
+	}
+	
+	private List<List<Integer>> getCombinations(int[] A, List<List<Integer>> s, int f)
+	{
+	    if(f == 1)
+	        return s;
+	    List<List<Integer>> newSet = new ArrayList<>();
+	    for (List<Integer> ss : s)
+	    {
+	        for(Integer elm : A)
+	        {
+	            if(ss.contains(elm))
+	                continue;
+	            List<Integer> sss = new ArrayList<>(ss);
+	            sss.add(elm);
+	            newSet.add(sss);
+	        }
+	    }
+	    return getCombinations(A, newSet, f-1);
+	}
+	
 	private List<List<Integer>> possibilities(int size) {
-		List<List<Integer>> result = new ArrayList<>();
-	 
-		result.add(new ArrayList<Integer>());
-	 
-		for (int i = 0; i < size; i++) {
-			List<List<Integer>> current = new ArrayList<>();
-	 
-			for (List<Integer> l : result) {
-				for (int j = 0; j < l.size()+1; j++) {
-					l.add(j, i);
-	 
-					List<Integer> temp = new ArrayList<>(l);
-					current.add(temp);
-					l.remove(j);
-				}
-			}
-	 
-			result = new ArrayList<>(current);
-		}
-	 
-		return result;
+		return possibilities(0, size, size);
 	}
 	
 	private boolean tryPossibility(Sudoku sudoku, List<Position> pos, List<Integer> possibles, List<Integer> possibility) {
